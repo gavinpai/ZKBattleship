@@ -35,3 +35,7 @@ def is_prime_helper(m, k, n):
         if (b % n == n - 1):
             return True
     return True 
+
+for i in range(10000):
+    if (is_prime(i) and is_prime(i * 2 + 1)):
+        print(i)
