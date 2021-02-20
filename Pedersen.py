@@ -23,7 +23,7 @@ class Pedersen:
     def __init__(self, state, a = None):
         self.state = state
         self.a = a
-    def new_state(bit_length = 128):
+    def new_state(bit_length = 32):
         q = random_prime.safe_prime(bit_length)
         p = q * 2 + 1
         a = secrets.randbelow(q - 1) + 1
@@ -37,5 +37,3 @@ class Pedersen:
         return(self.commit_r(x, secrets.randbelow(self.state.q)))
     def verify(self, x, state):
         return(self.commit_r(x, state.r).public_commitment() == state.c)
-        
-
