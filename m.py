@@ -83,9 +83,20 @@ print(a.verify(10,c))
 #Ring signature test
 def hash_int(int):
     return int.from_bytes(hashlib.sha256((int).to_bytes(16, "big")).digest(), "big") 
+"""
 u = secrets.randbelow(32)+ 1
 v = hash_int(u)
 v = hash_int(v ^ pow((secrets.randbelow(32) + 1), 2)) % 5
 v = hash_int(v ^ pow((secrets.randbelow(32) + 1), 3)) % 7
 v = pow(hash_int(u % v),4) % 6
+"""
+p = [secrets.randbelow(64) + 1 for i in range(2)]
+s = [secrets.randbelow(64) + 1 for i in range(2)]
+n = [secrets.randbelow(256) + 1 for i in range(2)]
+u = secrets.randbelow(32)+ 1
+v = hash_int(u)
+for i in range(2):
+    v = hash_int(v ^ (pow(s[i], p[i]) % n[i]) % n[i])
+v = pow(hash_int(u % v),4) % 7
+print(a)
 
