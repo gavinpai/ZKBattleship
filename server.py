@@ -1,38 +1,73 @@
-#Code from Tim on youtube
-
 import socket
 import threading
+import pickle
 
-HEADER = 64
-PORT = 5050
-SERVER = socket.gethostbyname(socket.gethostname())
-ADDR = (SERVER, PORT)
-FORMAT = 'utf-8'
-DISCONNECT_MESSAGE = "!DISCONNECT"
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind(ADDR)
+class Server:
 
-def handle_client(conn, addr):
-    print(f"[NEW CONNECTION] {ADDR} connected.")
-    connected = True
-    while connected:
-        msg_length = conn.recv(HEADER).decode(FORMAT)
-        msg_length = int(msg_length)
-        msg = conn.recv(msg_length).decode(FORMAT)
-        if msg == DISCONNECT_MESSAGE:
-            connected = False
-        print(f"[{addr}] {msg}")
-    conn.close()
-
-def start():
-    server.listen()
-    print(f"[LISTENING] listening on {SERVER}")
-    while True:
-        conn, addr = server.accept()
-        thread = threading.Thread(target = handle_client, args = (conn, addr))
-        thread.start()
-        print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
+    def __init__(self, port, server_ip, my_port, my_server_ip, client, file):
+        self.input = []
+        self.header_length = 128
+        self.my_port = my_port
+        self.my_server_ip = my_server_ip
+        self.my_address = (self.my_server_ip, self.my_port)
+        self.port = port
+        self.server_ip = server_ip
+        self.address = (self.server_ip, self.port)
+        self.c = client
+        self.file = file
+        
+    def send(self, msg):
+        message = pickle.dumps(msg)
+        msg_length = len(message)
+        send_length = pickle.dumps(msg_length)
+        send_length += b' ' *  (header_length - len(send_length))
+        self.client.send(send_length)
+        self.client.send(message)
 
 
-print("STARTING")
-start()
+    def handle_client(self, conn, addr):
+        connected = True
+        print("test")
+        with open(self.file) as f:
+            while connected:
+                msg_length = pickle.loads(conn.recv(64))
+                if msg_length:
+                    msg_length = int(msg_length)
+                    msg = pickle.loads(conn.recv(msg_length))
+                    if msg.lower() == "disconnect":
+                        connected = False
+                    self.input.append(msg)
+                    f.write(msg + "\n")
+                        
+                    print(msg)
+        conn.close()
+    def server_loop(self):
+        self.server.bind(self.my_address)
+        self.server.listen()
+        while True:
+            conn, addr = self.server.accept()
+            thread = threading.Thread(target = self.handle_client, args = (conn, addr))
+            thread.start()
+    def client_loop(self):
+        self.client.connect(self.address)
+        m = input()
+        connected = True
+        while connected:
+            m = input()
+            if m.lower() == "disconnect":
+                connected = False
+            self.send(m)
+        
+    def start(self):
+        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        #if (self.c):
+        print(0)
+        server_thread = threading.Thread(target = self.server_loop)
+        server_thread.start()
+        print(1)
+        input()
+        client_thread = threading.Thread(target = self.client_loop)
+        client_thread.start()
+        
+
