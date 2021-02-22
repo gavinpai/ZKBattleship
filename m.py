@@ -91,20 +91,39 @@ v = hash_int(v ^ pow((secrets.randbelow(32) + 1), 2)) % 5
 v = hash_int(v ^ pow((secrets.randbelow(32) + 1), 3)) % 7
 v = pow(hash_int(u % v),4) % 6
 """
-
+message = 0
 a = Pedersen.Pedersen.new_state(64)
-b = a.commit(1)
+b = a.commit(message)
 Q = a.state.q
 H = a.state.h
 G = a.state.g
 P = a.state.p
 R = b.r
 C = b.c
+
+# Normal prover
+"""
 r = secrets.randbelow(P)
 x = pow(H, r, P)
 e = 3
-y = (r - R * e) % (P-1)
-print(x, pow(H, y, P) * pow(C * pow(G, -1, P), e, P) % P)
+y = (r - R * e) % (Q)
+print(x, pow(H, y, P) * pow(C, e, P) % P) # For C = 0
+#print(x, pow(H, y, P) * pow(C * pow(G, -1, P), e, P) % P) # For C = 1
+"""
+
+
+# Cheating prover (e is known)
+if message == 0:
+    e1 = secrets.randbelow(Q)
+    y1 = secrets.randbelow(Q)
+    x1 = pow(H, y1, P) * pow(C*pow(H,-1,P), e1, P) % P
+    e = secrets.randbelow(Q) # from verifier
+    r = secrets.randbelow(Q)
+    e0 = (e - e1) % P
+    y0 = (r - R * e0) % (Q)
+    x0 = pow(H,r,P)
+    print(x1, pow(H, y1, P) * pow(C*pow(H,-1,P), e1, P) % P)
+    print(x0, pow(H, y0, P) * pow(C, e0, P) % P)
 
 
 

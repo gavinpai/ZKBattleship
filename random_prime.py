@@ -1,8 +1,7 @@
 import secrets
-import random
 
 def is_prime_helper(m, k, n):
-    a = random.randint(2, n - 3)
+    a = secrets.randbelow(n - 5) + 2
     b = pow(a, m, n)
     if (b == 1 or b == n - 1):
         return True
