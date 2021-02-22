@@ -23,12 +23,12 @@ class Pedersen:
     def __init__(self, state, a = None):
         self.state = state
         self.a = a
-    def new_state(bit_length = 256):
-        q = random_prime.safe_prime(bit_length)
-        p = q * 2 + 1
-        a = secrets.randbelow(q - 1) + 1
-        g = secrets.randbelow(q - 1) + 1
-        h = pow(g, a, q)
+    def new_state(bit_length = 64):
+        q = random_prime.schnorr_prime_randbits(bit_length)
+        p = q * 4 + 1
+        a = secrets.randbelow(q)
+        g = random_prime.generator(p, q)
+        h = pow(g, a, p)
         state = Pedersen_Public_State(p, q, g, h)
         return Pedersen(state, a)
     def commit_r(self, x, r):
@@ -37,3 +37,4 @@ class Pedersen:
         return self.commit_r(x, secrets.randbelow(self.state.q))
     def verify(self, x, state):
         return self.commit_r(x, state.r).public_commitment() == state.c
+

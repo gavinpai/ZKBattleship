@@ -37,14 +37,37 @@ def is_prime(n, s = 128):
             return False
     return True
 
-def random_prime(bit_length):
+def prime_randbits(bit_length):
     x = secrets.randbits(bit_length - 1) * 2 + 1
     while (not is_prime(x)):
         x += 2
     return x
     
-def safe_prime(bit_length):
+def safe_prime_randbits(bit_length):
     x = secrets.randbits(bit_length - 1) * 2 + 1
     while ((not is_prime(x)) or (not is_prime(x * 2 + 1))):
         x += 2
     return x
+
+def schnorr_prime_randbits(bit_length):
+    x = secrets.randbits(bit_length - 1) * 2 + 1
+    while ((not is_prime(x)) or (not is_prime(x * 4 + 1))):
+        x += 2
+    return x
+
+def prime_randbelow(n):
+    x = secrets.randbelow(n)
+    while (not is_prime(x)):
+        x += 2
+    if (x > n):
+        return prime_randbelow(n)
+    return x
+    
+
+def generator(p, q):
+    g = prime_randbelow(q)
+    while pow(g,q,p) != 1:
+        g += 2
+        while not is_prime(g):
+            g += 2
+    return g
