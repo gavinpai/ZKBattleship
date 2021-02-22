@@ -65,7 +65,7 @@ def prime_randbelow(n):
     
 
 def generator(p, q):
-    g = prime_randbelow(q)
+    g = prime_randbelow(30)
     while pow(g,q,p) != 1:
         g += 2
         while not is_prime(g):

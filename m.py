@@ -2,6 +2,7 @@ import pickle
 import Pedersen
 import secrets
 import hashlib
+import random_prime
 #testing adding commitments
 """
 a = Pedersen.Pedersen.new_state()
@@ -81,14 +82,34 @@ c = Pedersen.Pedersen_Commit_Output.add_commitments(a.state, b, b)
 print(a.verify(10,c))
 """
 #Ring signature test
+"""
 def hash_int(int):
     return int.from_bytes(hashlib.blake2b((int).to_bytes(16, "big")).digest()[:8], "big") 
-"""
 u = secrets.randbelow(32)+ 1
 v = hash_int(u)
 v = hash_int(v ^ pow((secrets.randbelow(32) + 1), 2)) % 5
 v = hash_int(v ^ pow((secrets.randbelow(32) + 1), 3)) % 7
 v = pow(hash_int(u % v),4) % 6
 """
+
+a = Pedersen.Pedersen.new_state(64)
+b = a.commit(1)
+Q = a.state.q
+H = a.state.h
+G = a.state.g
+P = a.state.p
+R = b.r
+C = b.c
+r = secrets.randbelow(P)
+x = pow(H, r, P)
+e = 3
+y = (r - R * e) % (P-1)
+print(x, pow(H, y, P) * pow(C * pow(G, -1, P), e, P) % P)
+
+
+
+
+
+
 
 

@@ -27,7 +27,7 @@ class Pedersen:
         q = random_prime.schnorr_prime_randbits(bit_length)
         p = q * 4 + 1
         a = secrets.randbelow(q)
-        g = random_prime.generator(p, q)
+        g = 3
         h = pow(g, a, p)
         state = Pedersen_Public_State(p, q, g, h)
         return Pedersen(state, a)
@@ -38,3 +38,18 @@ class Pedersen:
     def verify(self, x, state):
         return self.commit_r(x, state.r).public_commitment() == state.c
 
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    
+    
