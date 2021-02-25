@@ -38,7 +38,7 @@ def test():
     test_send_object()
     test_add_commitment_2()
 
-test()
+
 
 # Cheating prover (e is known)
 
@@ -54,18 +54,25 @@ C = b.c
 if message == 0:
     e1 = secrets.randbelow(P)
     y1 = secrets.randbelow(P)
-    x1 = pow(H, y1, P) * pow(C*pow(H,-1,P), e1, P) % P
-    e = int.from_bytes(hashlib.blake2b(pickle.dumps((e1, y1, x1))).digest(),
-                       "big") % P
-    print(e)
-    print(e1)
     r = secrets.randbelow(P)
+    x0 = pow(H,r, P)
+    x1 = pow(H, y1, P) * pow(C*pow(G,-1,P), -e1, P) % P
+    e = int.from_bytes(hashlib.blake2b(pickle.dumps((x0, x1))).digest(),
+                       "big") % P
     e0 = (e - e1) % P
     y0 = (r + R * e0) % (P - 1)
-    x0 = pow(H,r, P)
-    print(x1 == pow(H, y1, P) * pow(C*pow(H,-1,P), e1, P) % P)
-    print(x0 * pow(C, e0, P) % P  == pow(H, y0, P))
-    print((e1 + e0) % P == e)
 
-
+if message == 1:
+    e0 = secrets.randbelow(P)
+    y0 = secrets.randbelow(P)
+    r = secrets.randbelow(P)
+    x1 = pow(H,r, P)
+    x0 = pow(H, y0, P) * pow(C, -e0, P) % P
+    e = int.from_bytes(hashlib.blake2b(pickle.dumps((x0, x1))).digest(),
+                       "big") % P
+    e1 = (e - e0) % P
+    y1 = (r + R * e1) % (P - 1)
+print(x1 * pow(C*pow(G,-1,P), e1, P) % P== pow(H, y1, P))
+print(x0 * pow(C, e0, P) % P == pow(H, y0, P))
+print((e1 + e0) % P == e)
 
