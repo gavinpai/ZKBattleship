@@ -16,7 +16,7 @@ class Board:
         for i in range(len(self.board)):
             for j in range(len(self.board[i])):
                 self.commit_board[i][j] = self.commitment_generator.commit(self.board[i][j])
-                self.public_commitments[i][j] = self.commit_board[i][j].public_commitment();
+                self.public_commitments[i][j] = self.commit_board[i][j].c;
     def send_commitments(self):
         return pickle.dumps(self.public_commitments)
     def verify_commitments(self):

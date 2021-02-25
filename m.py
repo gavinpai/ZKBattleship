@@ -38,9 +38,10 @@ def test():
     test_send_object()
     test_add_commitment_2()
 
+test()
+
 # Cheating prover (e is known)
 
-"""
 message = 1
 a = Pedersen.Pedersen.new_state(64)
 b = a.commit(message)
@@ -54,16 +55,17 @@ if message == 0:
     e1 = secrets.randbelow(P)
     y1 = secrets.randbelow(P)
     x1 = pow(H, y1, P) * pow(C*pow(H,-1,P), e1, P) % P
-    e = int.from_bytes(hashlib.blake2b(pickle.dumps((e1,y1,x1))).digest(), "big") % P
+    e = int.from_bytes(hashlib.blake2b(pickle.dumps((e1, y1, x1))).digest(),
+                       "big") % P
     print(e)
     print(e1)
     r = secrets.randbelow(P)
     e0 = (e - e1) % P
-    y0 = (r + R * e0)% (P - 1)
+    y0 = (r + R * e0) % (P - 1)
     x0 = pow(H,r, P)
     print(x1 == pow(H, y1, P) * pow(C*pow(H,-1,P), e1, P) % P)
     print(x0 * pow(C, e0, P) % P  == pow(H, y0, P))
     print((e1 + e0) % P == e)
 
 
-"""
+
