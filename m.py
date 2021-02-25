@@ -119,7 +119,9 @@ if message == 0:
     e1 = secrets.randbelow(P)
     y1 = secrets.randbelow(P)
     x1 = pow(H, y1, P) * pow(C*pow(H,-1,P), e1, P) % P
-    e = secrets.randbelow(P) # from verifier
+    e = int.from_bytes(hashlib.blake2b(pickle.dumps((e1,y1,x1))).digest(), "big") % P
+    print(e)
+    print(e1)
     r = secrets.randbelow(P)
     e0 = (e - e1) % P
     y0 = (r + R * e0)% (P - 1)
