@@ -84,7 +84,7 @@ print(a.verify(10,c))
 #Ring signature test
 """
 def hash_int(int):
-    return int.from_bytes(hashlib.blake2b((int).to_bytes(16, "big")).digest()[:8], "big") 
+    return int.from_bytes(hashlib.blake2b((int).to_bytes(16, "big")).digest()[:8], "big")
 u = secrets.randbelow(32)+ 1
 v = hash_int(u)
 v = hash_int(v ^ pow((secrets.randbelow(32) + 1), 2)) % 5
@@ -113,22 +113,17 @@ print(x, pow(H, y, P) * pow(C, e, P) % P) # For C = 0
 
 
 # Cheating prover (e is known)
+
+
 if message == 0:
-    e1 = secrets.randbelow(Q)
-    y1 = secrets.randbelow(Q)
+    e1 = secrets.randbelow(P)
+    y1 = secrets.randbelow(P)
     x1 = pow(H, y1, P) * pow(C*pow(H,-1,P), e1, P) % P
-    e = secrets.randbelow(Q) # from verifier
-    r = secrets.randbelow(Q)
+    e = secrets.randbelow(P) # from verifier
+    r = secrets.randbelow(P)
     e0 = (e - e1) % P
-    y0 = (r - R * e0) % (Q)
-    x0 = pow(H,r,P)
-    print(x1, pow(H, y1, P) * pow(C*pow(H,-1,P), e1, P) % P)
-    print(x0, pow(H, y0, P) * pow(C, e0, P) % P)
-
-
-
-
-
-
-
-
+    y0 = (r + R * e0)% (P - 1)
+    x0 = pow(H,r, P)
+    print(x1 == pow(H, y1, P) * pow(C*pow(H,-1,P), e1, P) % P)
+    print(x0 * pow(C, e0, P) % P  == pow(H, y0, P))
+    print((e1 + e0) % P == e)
