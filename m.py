@@ -42,7 +42,7 @@ def test():
 
 # Cheating prover (e is known)
 
-message = 1
+message = 0
 a = Pedersen.Pedersen.new_state(64)
 b = a.commit(message)
 Q = a.state.q
@@ -61,7 +61,6 @@ if message == 0:
                        "big") % P
     e0 = (e - e1) % P
     y0 = (r + R * e0) % (P - 1)
-
 if message == 1:
     e0 = secrets.randbelow(P)
     y0 = secrets.randbelow(P)
@@ -72,6 +71,7 @@ if message == 1:
                        "big") % P
     e1 = (e - e0) % P
     y1 = (r + R * e1) % (P - 1)
+
 print(x1 * pow(C*pow(G,-1,P), e1, P) % P== pow(H, y1, P))
 print(x0 * pow(C, e0, P) % P == pow(H, y0, P))
 print((e1 + e0) % P == e)
