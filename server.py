@@ -2,8 +2,8 @@ import socket
 import threading
 import pickle
 import tkinter as tk
-class Server:
 
+class Server:
     def __init__(self, port, server_ip, my_port, my_server_ip):
         self.input = []
         self.header_length = 128
@@ -16,19 +16,30 @@ class Server:
         self.window = tk.Tk()
         self.test = tk.Label(text = "Enter in text to send:")
         self.test.pack()
-        self.entry = tk.Entry(foreground = "yellow", bg = "blue", width = 50)
+        self.entry = tk.Entry(width = 50)
         self.entry.pack()
         self.entry.bind("<Return>", self.load_input_tk)
         self.s = False
+        
     def print_tk(self, m):
         tk.Label(text = m).pack()
-    def load_input_tk(self, event):
-        self.s = True
-        m = self.entry.get()
-        self.print_tk(m)
-        self.send(m)
-        if m.lower() == "disconnect":
-            raise SystemExit(0)
+        
+    def load_input_tk(self, event = None):
+        if not self.s:
+            try:
+                self.client.connect(self.address)
+            except ConnectionRefusedError:
+                self.print_tk("Connection refused.")
+            else:
+                self.s = True
+                self.load_input_tk()
+        else:
+            m = self.entry.get()
+            self.print_tk(m)
+            self.send(m)
+            if m.lower() == "disconnect":
+                self.window.destroy()
+                raise SystemExit(0)
     def send(self, msg):
         message = pickle.dumps(msg)
         msg_length = len(message)
@@ -36,6 +47,7 @@ class Server:
         send_length += b' ' *  (self.header_length - len(send_length))
         self.client.send(send_length)
         self.client.send(message)
+        
 
 
     def handle_client(self, conn, addr):
@@ -46,6 +58,7 @@ class Server:
                 msg_length = int(msg_length)
                 msg = pickle.loads(conn.recv(msg_length))
                 if msg.lower() == "disconnect":
+                    self.window.destroy()
                     raise SystemExit(0)
                 if msg:
                     self.print_tk(msg)
@@ -62,10 +75,9 @@ class Server:
     def start(self):
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_thread = threading.Thread(target = self.server_loop)
+        server_thread = threading.Thread(target = self.server_loop, daemon = True)
         server_thread.start()
-        input()
-        self.client.connect(self.address)
         self.window.mainloop()
+        
         
 
