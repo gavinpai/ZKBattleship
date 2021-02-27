@@ -22,8 +22,9 @@ def is_prime(n, s = 128):
     Fermat primality test for a = 2 and a = 3
     Miller-Rabin primality test repeating s times
     """
-    prime = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61,
-             67, 71, 73, 79, 83, 89, 97}
+    prime = {2, 3, 5, 7, 11, 13, 17, 19, 23,
+             29, 31, 37, 41, 43, 47, 53, 59,
+             61, 67, 71, 73, 79, 83, 89, 97}
     if (n < 10000):
         return (n in prime)
     else:

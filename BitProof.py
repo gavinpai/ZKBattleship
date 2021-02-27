@@ -2,7 +2,8 @@ import secrets
 import hashlib
 import pickle
 import dataclasses
-
+import unittest
+import Pedersen
 
 class BitProof:
     """Makes and verifies bit proofs"""
@@ -59,3 +60,26 @@ class BitProof:
         c_d = ((bp_state.e1 + bp_state.e0) % p_state.p
                == bp_state.e)
         return c_a and c_b and c_c and c_d
+
+
+class TestBitProof(unittest.TestCase):
+
+    def test0(self):
+        a = Pedersen.Pedersen(64)
+        b = a.commit(0)
+        c = BitProof(0, b, a.state)
+        d = BitProof(1, b, a.state)
+        self.assertTrue(BitProof.verify(b.c, a.state, c.state))
+        self.assertFalse(BitProof.verify(b.c, a.state, d.state))
+
+    def test1(self):
+        a = Pedersen.Pedersen(64)
+        b = a.commit(1)
+        c = BitProof(0, b, a.state)
+        d = BitProof(1, b, a.state)
+        self.assertTrue(BitProof.verify(b.c, a.state, d.state))
+        self.assertFalse(BitProof.verify(b.c, a.state, c.state))
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -1,7 +1,7 @@
 import random_prime
 import secrets
 import dataclasses
-
+import unittest
 
 class Pedersen:
     """Generates, holds, and verifies Pedersen Commitments"""
@@ -59,3 +59,32 @@ class Pedersen:
     def verify(x, o_state, p_state):
         """Verifies that x equals the commitments value"""
         return Pedersen.commit_r(p_state, x, o_state.r).c == o_state.c
+
+
+class TestPedersen(unittest.TestCase):
+
+    def test_verify(self):
+        a = Pedersen(64)
+        b = a.commit(0)
+        self.assertTrue(Pedersen.verify(0, b, a.state))
+        self.assertFalse(Pedersen.verify(1, b, a.state))
+        c = a.commit(1)
+        self.assertTrue(Pedersen.verify(1, c, a.state))
+        self.assertFalse(Pedersen.verify(0, c, a.state))
+
+    def test_add(self):
+        a = Pedersen(64)
+        b = a.commit(0)
+        c = a.commit(1)
+        d = a.commit(2)
+        e = Pedersen.add_commitments(a.state, b, c)
+        f = Pedersen.add_commitments(a.state, b, c, d)
+        g = Pedersen.add_commitments(a.state, c, c)
+        self.assertTrue(Pedersen.verify(1, e, a.state))
+        self.assertFalse(Pedersen.verify(0, e, a.state))
+        self.assertTrue(Pedersen.verify(3, f, a.state))
+        self.assertTrue(Pedersen.verify(2, g, a.state))
+
+
+if __name__ == "__main__":
+    unittest.main()
