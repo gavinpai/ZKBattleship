@@ -1,5 +1,6 @@
 import secrets
 
+
 def is_prime_helper(m, k, n):
     """Returns if value is prime using Miller-Rabin primality test"""
     a = secrets.randbelow(n - 5) + 2
@@ -13,6 +14,7 @@ def is_prime_helper(m, k, n):
         if (b % n == n - 1):
             return True
     return True
+
 
 def is_prime(n, s = 128):
     """Returns if value is prime.
@@ -43,12 +45,14 @@ def is_prime(n, s = 128):
             return False
     return True
 
+
 def prime_randbits(bit_length):
     """Returns prime number of bits: bit_length"""
     x = secrets.randbits(bit_length - 1) * 2 + 1
     while (not is_prime(x)):
         x += 2
     return x
+
 
 def safe_prime_randbits(bit_length):
     """Returns safe prime number of bits: bit_length
@@ -59,6 +63,7 @@ def safe_prime_randbits(bit_length):
         x += 2
     return x
 
+
 def schnorr_prime_randbits(bit_length):
     """Returns schnorr prime number of bits: bit_length
     Schnorr primes are primes of which x * 4 + 1 is also a prime
@@ -67,6 +72,7 @@ def schnorr_prime_randbits(bit_length):
     while ((not is_prime(x)) or (not is_prime(x * 4 + 1))):
         x += 2
     return x
+
 
 def prime_randbelow(n):
     """Returns prime number less than: n"""
