@@ -42,7 +42,7 @@ def test():
 
 # Cheating prover (e is known)
 
-message = 0
+message = 1
 a = Pedersen.Pedersen.new_state(64)
 b = a.commit(message)
 Q = a.state.q
@@ -71,8 +71,10 @@ if message == 1:
                        "big") % P
     e1 = (e - e0) % P
     y1 = (r + R * e1) % (P - 1)
-
+print(e == int.from_bytes(hashlib.blake2b(pickle.dumps((x0, x1))).digest(),
+                       "big") % P)
 print(x1 * pow(C*pow(G,-1,P), e1, P) % P== pow(H, y1, P))
 print(x0 * pow(C, e0, P) % P == pow(H, y0, P))
 print((e1 + e0) % P == e)
+#send e, e0, e1, x0, x1, y0, y1
 
