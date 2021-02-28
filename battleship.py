@@ -1,3 +1,7 @@
+import pedersen
+import pickle
+import bitproof
+
 class Board:
     LETTERS = {'a': 1, 'b': 2, 'c': 3, 'd': 4,
                'e': 5, 'f': 6, 'g': 7, 'h': 8}
@@ -15,6 +19,26 @@ class Board:
     def reset_board(self):
         self.board = [0 for _ in range(64)]
 
+class CommitmentBoard(Board):
+    def __init_(self):
+        super().__init__(self)
+        self.commitment_generator = Pedersen.Pedersen.new_state(64)
+        self.commitment_board = [None for _ in range(64)]
+        self.public_commitments = [0 for _ in range(64)]
+    def update_commitments(self):
+            self.commit_board = [self.commitment_generator.commit(x)
+                                  for x in self.board]
+            self.public_commitments = [x.c for x in  self.commitment_board]
+    def send_commitments(self):
+        return pickle.dumps(self.public_commitments)
+    def send_sum_proof(self):
+        return pickle.dumps(Pedersen.add_commitments(*self.commitment_board))
+    def send_bit_proof(self):
+        return pickle.dumps(
+            [bitproof.bit_proof(x, y, self.commitment_generator.state)
+             for x, y in zip(self.board, self.commitment_board)]
+            )
+        
 class ShipBoard(Board):
     def input_board(self, t = 8):
         i = 0
@@ -116,11 +140,5 @@ class Game:
                 print(self.guesses[0])
                 print(self.guesses[1])
                 print("Player {} won!".format(1 if self.score[0] = 8 else 2))
-            
-            
-        
-a = Game()
-a.setup()
-a.game()
 
 

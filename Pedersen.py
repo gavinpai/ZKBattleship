@@ -13,10 +13,10 @@ class Pedersen:
         a = secrets.randbelow(q)
         g = Pedersen.generator(p, q)
         h = pow(g, a, p)
-        self.state = Pedersen.Public_State(p, q, g, h)
+        self.state = Pedersen.PublicState(p, q, g, h)
 
     @dataclasses.dataclass
-    class Public_State:
+    class PublicState:
         """Class holding the public variables of the Pedersen commitment"""
         p: int
         q: int
@@ -24,7 +24,7 @@ class Pedersen:
         h: int
 
     @dataclasses.dataclass
-    class Commit_Output:
+    class CommitmentOutput:
         """Holds the output of a Pedersen Commitment"""
         c: int
         r: int
@@ -40,7 +40,7 @@ class Pedersen:
 
     def commit_r(state, x, r):
         """Commits x with a predetermined random number"""
-        return Pedersen.Commit_Output(pow(state.g, x, state.p)
+        return Pedersen.CommitmentOutput(pow(state.g, x, state.p)
                                       * pow(state.h, r, state.p)
                                       % state.p, r)
 
@@ -54,7 +54,7 @@ class Pedersen:
         for commitment in commitments:
             c = c * commitment.c % state.p
             r = (r + commitment.r) % state.p
-        return Pedersen.Commit_Output(c, r)
+        return Pedersen.CommitmentOutput(c, r)
 
     def verify(x, o_state, p_state):
         """Verifies that x equals the commitments value"""
