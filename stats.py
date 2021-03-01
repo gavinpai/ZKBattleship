@@ -1,7 +1,12 @@
 import pedersen
 from matplotlib import pyplot as plt
+from scipy import stats
 import time
 import statistics
+import battleship
+import sys
+import secrets
+import bitproof
 def pedersen_histogram():
     x= 1000000
     gen = pedersen.Pedersen(256)
@@ -49,7 +54,7 @@ def time_generate():
     plt.show()
 
 def full_proof():
-    a = ShipBoard()
+    a = battleship.ShipBoard()
     a.set_spot("a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8")
     times = []
     sizes = []
@@ -64,6 +69,49 @@ def full_proof():
     print(statistics.stdev(times))
     print(statistics.mean(sizes))
     print(statistics.stdev(sizes))
-    
 
-time_generate()
+def pedersen_distribution():
+    x= 1000000
+    gen = pedersen.Pedersen(256)
+    c0 = []
+    c1 = []
+    for i in range(x):
+        c0.append(gen.commit(0).c / 1.0)
+        c1.append(gen.commit(1).c / 1.0)
+        if (i % (x / 100) == 0):
+            print(100 * i / x)
+    print(stats.ks_2samp(c0, c1))
+    print("ks 0:", stats.kstest(c0, "uniform"))
+    print("ks 1:", stats.kstest(c1, "uniform"))
+    print("0", stats.describe(c0))
+    print("1", stats.describe(c1))
+    print("0 repeats:", stats.find_repeats(c0))
+    print("1 repeats:", stats.find_repeats(c1))
+    print("0 entropy:", stats.entropy(c0))
+    print("1 entropy:", stats.entropy(c1))
+    input()
+
+def bitproof_test():
+    x= 200000
+    gen = pedersen.Pedersen(64)
+    c0 = gen.commit(0)
+    c1 = gen.commit(1)
+    b0 = []
+    b1 = []
+    for i in range(x):
+        b0.append(bitproof.bitproof(0, c0, gen.state).x1 / 1.0)
+        b1.append(bitproof.bitproof(1, c1, gen.state).x1 / 1.0)
+        if (i % (x/100) == 0):
+            print(100 * i / x)
+    print("x1")
+    print(stats.ks_2samp(b0, b1))
+    print("ks 0:", stats.kstest(b0, "uniform"))
+    print("ks 1:", stats.kstest(b1, "uniform"))
+    print("0", stats.describe(b0))
+    print("1", stats.describe(b1))
+    print("0 repeats:", stats.find_repeats(b0))
+    print("1 repeats:", stats.find_repeats(b1))
+    print("0 entropy:", stats.entropy(b0))
+    print("1 entropy:", stats.entropy(b1))
+    input()
+bitproof_test()
