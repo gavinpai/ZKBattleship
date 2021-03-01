@@ -52,8 +52,8 @@ class Pedersen:
         """Adds an arbitrary amount of Pedersen Commitments"""
         c, r = 1, 0
         for commitment in commitments:
-            c = c * commitment.c % state.p
-            r = (r + commitment.r) % state.p
+            c = (c * commitment.c) % state.p
+            r = r + commitment.r
         return Pedersen.CommitmentOutput(c, r)
 
     def verify(x, o_state, p_state):
@@ -65,8 +65,8 @@ class TestPedersen(unittest.TestCase):
 
     def test_verify(self):
         a = Pedersen(64)
-        b = a.commit(0)
-        self.assertTrue(Pedersen.verify(0, b, a.state))
+        b = a.commit(3)
+        self.assertTrue(Pedersen.verify(3, b, a.state))
         self.assertFalse(Pedersen.verify(1, b, a.state))
         c = a.commit(1)
         self.assertTrue(Pedersen.verify(1, c, a.state))
@@ -74,17 +74,21 @@ class TestPedersen(unittest.TestCase):
 
     def test_add(self):
         a = Pedersen(64)
-        b = a.commit(0)
+        b = a.commit(3)
         c = a.commit(1)
         d = a.commit(2)
         e = Pedersen.add_commitments(a.state, b, c)
         f = Pedersen.add_commitments(a.state, b, c, d)
         g = Pedersen.add_commitments(a.state, c, c)
-        self.assertTrue(Pedersen.verify(1, e, a.state))
+        self.assertTrue(Pedersen.verify(4, e, a.state))
         self.assertFalse(Pedersen.verify(0, e, a.state))
-        self.assertTrue(Pedersen.verify(3, f, a.state))
+        self.assertTrue(Pedersen.verify(6, f, a.state))
         self.assertTrue(Pedersen.verify(2, g, a.state))
 
-
+    def test_list(self):
+        a = Pedersen(64)
+        b = [a.commit(2) for i in range(200)]
+        c = Pedersen.add_commitments(a.state, *b)
+        self.assertTrue(Pedersen.verify(400, c, a.state))
 if __name__ == "__main__":
     unittest.main()

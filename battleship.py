@@ -1,6 +1,7 @@
 import pedersen
 import pickle
 import bitproof
+import unittest
 
 class Board:
 
@@ -11,7 +12,8 @@ class Board:
         self.board = [0 for _ in range(64)]
 
     def get_spot_index(self, spot):
-        if int(spot[1]) < 1 or int(spot[1]) > 8 or spot[0] not in self.LETTERS:
+        if (int(spot[1]) < 1 or int(spot[1]) > 8
+            or spot[0] not in self.LETTERS):
             raise ValueError
         return (self.LETTERS[spot[0].lower()] -  1) * 8 + int(spot[1]) - 1
 
@@ -23,35 +25,36 @@ class Board:
 
 class CommitmentBoard(Board):
 
-    def __init_(self):
-        super().__init__(self)
-        self.commitment_generator = Pedersen.Pedersen.new_state(64)
+    def __init__(self):
+        super().__init__()
+        self.commitment_generator = pedersen.Pedersen(64)
         self.commitment_board = [None for _ in range(64)]
         self.public_commitments = [0 for _ in range(64)]
 
     def update_commitments(self):
-            self.commit_board = [self.commitment_generator.commit(x)
+            self.commitment_board = [self.commitment_generator.commit(x)
                                   for x in self.board]
-            self.public_commitments = [x.c for x in  self.commitment_board]
+            self.public_commitments = [x.c for x in self.commitment_board]
 
     def send_commitments(self):
         return self.public_commitments
 
     def send_sum_proof(self):
-        return Pedersen.add_commitments(*self.commitment_board)
-
+        return pedersen.Pedersen.add_commitments(
+            self.commitment_generator.state, *self.commitment_board)
+    
     def send_bit_proof(self):
-        return [bitproof.bit_proof(x, y, self.commitment_generator.state)
+        return [bitproof.bitproof(x, y, self.commitment_generator.state)
                 for x, y in zip(self.board, self.commitment_board)]
 
     def send_initial(self):
-        return pickle.dumps(self.send_commitments(),
+        return pickle.dumps((self.send_commitments(),
                             self.send_sum_proof(),
                             self.send_bit_proof(),
-                            self.commitment_generator.state)
+                            self.commitment_generator.state))
 
 class ShipBoard(CommitmentBoard):
-
+        
     def input_board(self, t = 8):
         i = 0
         while i < t:
@@ -152,4 +155,19 @@ class Game:
                 print(self.boards[1])
                 print(self.guesses[0])
                 print(self.guesses[1])
-                print("Player {} won!".format(1 if self.score[0] == 8 else 2))
+                print("Player {} won!".format(
+                    1 if self.score[0] == 8 else 2))
+
+class TestProofs(unittest.TestCase):
+    def test(self):
+        a = ShipBoard()
+        a.set_spot("a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8")
+        a.update_commitments()
+        b = a.send_initial()
+        c = pickle.loads(b)
+        self.assertTrue(pedersen.Pedersen.verify(8, c[1], c[3]))
+        self.assertFalse(pedersen.Pedersen.verify(9, c[1], c[3]))
+        for x, y in zip(c[0], c[2]):
+            self.assertTrue(bitproof.verify(x, c[3], y))
+if __name__ == "__main__":
+    unittest.main()
