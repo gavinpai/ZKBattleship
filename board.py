@@ -2,6 +2,7 @@ import pedersen
 import pickle
 import bitproof
 import unittest
+import time
 
 class Board:
 
@@ -58,7 +59,7 @@ class CommitmentBoard(Board):
 
 class ShipBoard(CommitmentBoard):
         
-    def input_board(self, t = 8):
+    def input_board(self, f = None, t = 8):
         i = 0
         while i < t:
             print(self)
@@ -74,10 +75,12 @@ class ShipBoard(CommitmentBoard):
                 self.set_spot(a)
             except ValueError:
                 print(f"{a} is not a spot on the board")
-                continue
             except IndexError:
                 print(f"{a} is not a spot on the board")
-                continue
+            time.sleep(1.5)
+            if f:
+                _ = f()
+        
 
     def __repr__(self):
         a = ' '
