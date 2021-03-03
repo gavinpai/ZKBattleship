@@ -1,4 +1,4 @@
-from board import *
+import board
 import pickle
 import pedersen
 import bitproof
@@ -20,26 +20,17 @@ class Player:
     def __init__(self, t, n):
         self.turn = t
         self.name = n
-        self.board = ShipBoard()
-        self.guess = GuessBoard()
+        self.board = board.ShipBoard()
+        self.guess = board.GuessBoard()
         self.playing = False
         self.score = 0
         self.commitments = None
         self.other = None
         self.op = None
 
-    async def test_proofs(self, x):
-        assert len(x[0]) == 64
-        assert pedersen.Pedersen.verify(8, x[1], x[3])
-        assert (functools.reduce(lambda z, y: z * y % x[3].p, x[0])
-                == x[1].c)
-        for c, b in zip(x[0], x[2]):
-            assert bitproof.verify(c, x[3], b)
-        
-            
     async def setup(self, other):
         print(f"Board {self.name}:")
-        self.board.input_board(lambda : os.system(CLEAR))
+        self.board.input_board(lambda : os.system(self.CLEAR))
         self.board.update_commitments()
         self.other = other
         self.other.commitments = self.board.commitment_board
@@ -58,11 +49,19 @@ class Player:
                 time.sleep(3)
                 raise SystemExit
         
+    async def test_proofs(self, x):
+        assert len(x[0]) == 64
+        assert pedersen.Pedersen.verify(8, x[1], x[3])
+        assert (functools.reduce(lambda z, y: z * y % x[3].p, x[0])
+                == x[1].c)
+        for c, b in zip(x[0], x[2]):
+            assert bitproof.verify(c, x[3], b)
+        
     async def get_proofs(self):
         await poll(lambda: self.commitments)
         return self.board.send_initial()
 
-    def get(self, a):
+    async def get(self, a):
         x = self.board.get_spot(a)
         y = self.board.get_commitment(a)
         return pickle.dumps((x, y))
@@ -71,15 +70,17 @@ class Player:
     async def ask(self):
         print(f"Player {self.name}'s turn")
         while True:
-            os.system(self.CLEAR)
+            if self.CLEAR:
+                os.system(self.CLEAR)
             print(self.guess)
             a = input("Input a coordinate to guess: \n")
             try:
                 if self.guess.get_spot(a) == 0:
-                    x = pickle.loads(self.other.get(a))
+                    x = pickle.loads(await self.other.get(a))
                     assert pedersen.Pedersen.verify(x[0], x[1], self.op)
                     self.guess.set_spot(a, 2 if x[0] == 1 else 1)
-                    os.system(self.CLEAR)
+                    if self.CLEAR:
+                        os.system(self.CLEAR)
                     print(self.guess)
                     if x[0] == 1:
                         self.score += 1
@@ -89,11 +90,10 @@ class Player:
                     break
             except ValueError:
                 print(f"{a} is not a spot on the board")
-                continue
             except IndexError:
                 print(f"{a} is not a spot on the board")
-                continue
-        time.sleep(3)
+            time.sleep(2)
+        time.sleep(2)
 
 async def main():
     a = Player(True, 0)
