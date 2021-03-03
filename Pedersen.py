@@ -35,8 +35,9 @@ class Pedersen:
         g = secrets.randbelow(q)
         while pow(g,q,p) != 1:
             g += 2
-        if (g > q):
-            return generator(p, q)
+            if (g > q):
+                g = secrets.randbelow(q)
+                continue
         return g
 
     def commit_r(state, x, r):
@@ -51,15 +52,17 @@ class Pedersen:
 
     def add_commitments(state, *commitments):
         """Adds an arbitrary amount of Pedersen Commitments"""
-        c = functools.reduce(lambda x, y: x * y % state.p,
-                             map(lambda x : x.c, commitments))
-        r = functools.reduce(lambda x, y: x + y, map(lambda x: x.r, commitments))
-        return Pedersen.CommitmentOutput(c, r)
+        return Pedersen.CommitmentOutput(
+            functools.reduce(lambda x, y: x * y % state.p,
+                             map(lambda x : x.c, commitments)),
+            functools.reduce(lambda x, y: x + y,
+                             map(lambda x: x.r, commitments))
+            )
 
     def verify(x, o_state, p_state):
         """Verifies that x equals the commitments value"""
         return Pedersen.commit_r(p_state, x, o_state.r).c == o_state.c
-        
+
 class TestPedersen(unittest.TestCase):
 
     def test_verify(self):
@@ -89,5 +92,6 @@ class TestPedersen(unittest.TestCase):
         b = [a.commit(2) for i in range(200)]
         c = Pedersen.add_commitments(a.state, *b)
         self.assertTrue(Pedersen.verify(400, c, a.state))
+
 if __name__ == "__main__":
     unittest.main()

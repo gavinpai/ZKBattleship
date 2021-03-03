@@ -3,11 +3,14 @@ from matplotlib import pyplot as plt
 from scipy import stats
 import time
 import statistics
-import battleship
+import board
 import sys
-import secrets
 import bitproof
+
 def pedersen_histogram():
+    """Plots histograms of public values of Pedersen commitments
+    when message is zero or one
+    """
     x= 1000000
     gen = pedersen.Pedersen(256)
     c0 = []
@@ -30,6 +33,7 @@ def pedersen_histogram():
     plt.show()
 
 def time_generate():
+    """Returns the time to generate a Pedersen commitment of selected sizes"""
     c = []
     x = 1000
     a = ("16", "32", "64", "128", "256")
@@ -54,6 +58,7 @@ def time_generate():
     plt.show()
 
 def full_proof():
+    """Returns the size and time to genrerate a full proof (sum and bit)"""
     a = battleship.ShipBoard()
     a.set_spot("a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8")
     times = []
@@ -71,6 +76,9 @@ def full_proof():
     print(statistics.stdev(sizes))
 
 def pedersen_distribution():
+    """Returns tests for the distribution of public values
+    for Pedersen commitments when the message is zero or one
+    """ 
     x= 1000000
     gen = pedersen.Pedersen(256)
     c0 = []
@@ -91,16 +99,21 @@ def pedersen_distribution():
     print("1 entropy:", stats.entropy(c1))
     input()
 
-def bitproof_test():
-    x= 200000
+def bitproof_test(z, same_graph = False, x = 100000):
+    """Print's histogram for selected value of bitproof commitment
+    along with statistical tests on the values
+    z takes the form of lambda x: x.(variable here)
+    same_graph is whether the histograms are on the same page
+    x is the number of trials
+    """
     gen = pedersen.Pedersen(64)
     c0 = gen.commit(0)
     c1 = gen.commit(1)
     b0 = []
     b1 = []
     for i in range(x):
-        b0.append(bitproof.bitproof(0, c0, gen.state).y1 / 1.0)
-        b1.append(bitproof.bitproof(1, c1, gen.state).y1 / 1.0)
+        b0.append(z(bitproof.bitproof(0, c0, gen.state)) / 1.0)
+        b1.append(z(bitproof.bitproof(1, c1, gen.state)) / 1.0)
         if (i % (x/100) == 0):
             print(100 * i / x)
     print("y1")
@@ -114,7 +127,10 @@ def bitproof_test():
     print("0 entropy:", stats.entropy(b0))
     print("1 entropy:", stats.entropy(b1))
     plt.hist(b0, bins = "auto", range = (0, gen.state.p / 1.0))
-    plt.show()
+    if not same_graph:
+        plt.show()
     plt.hist(b1, bins = "auto", range = (0, gen.state.p / 1.0))
     plt.show()
-bitproof_test()
+
+if __name__ == "__main__":
+    bitproof_test(lambda x : x.y1, True)

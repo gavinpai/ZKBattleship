@@ -1,5 +1,6 @@
 import secrets
-
+import unittest
+import math
 
 def is_prime_helper(m, k, n):
     """Returns if value is prime using Miller-Rabin primality test"""
@@ -22,13 +23,13 @@ def is_prime(n, s = 128):
     Fermat primality test for a = 2 and a = 3
     Miller-Rabin primality test repeating s times
     """
-    prime = {2, 3, 5, 7, 11, 13, 17, 19, 23,
+    PRIME = {2, 3, 5, 7, 11, 13, 17, 19, 23,
              29, 31, 37, 41, 43, 47, 53, 59,
              61, 67, 71, 73, 79, 83, 89, 97}
     if n < 100:
-        return n in prime
+        return n in PRIME
     else:
-        for x in prime:
+        for x in PRIME:
             if n % x == 0:
                 return False
     if (pow(2, n - 1, n) != 1):
@@ -80,6 +81,39 @@ def prime_randbelow(n):
     x = secrets.randbelow(n)
     while not is_prime(x):
         x += 2
-    if x > n:
-        return prime_randbelow(n)
+        if x > n:
+            x = secrets.randbelow(n)
+            continue
     return x
+
+def primality_check(x):
+    """Deterministically checks if x is prime"""
+    for i in range(2, math.ceil(math.sqrt(x))):
+        if x % i == 0:
+            return False
+    return True
+
+class TestPrime(unittest.TestCase):
+
+    def test_randbelow(self):
+        for i in range(500):
+            self.assertTrue(primality_check(prime_randbelow(2**16)))
+
+    def test_schnorr_prime_randbits(self):
+        for i in range(500):
+            a = schnorr_prime_randbits(16)
+            self.assertTrue(primality_check(a))
+            self.assertTrue(primality_check(a * 4 + 1))
+
+    def test_safe_prime_randbits(self):
+        for i in range(500):
+            a = safe_prime_randbits(16)
+            self.assertTrue(primality_check(a))
+            self.assertTrue(primality_check(a * 2 + 1))
+
+    def test_prime_randbits(self):
+        for i in range(500):
+            self.assertTrue(primality_check(prime_randbits(16)))
+
+if __name__ == "__main__":
+    unittest.main()

@@ -8,16 +8,21 @@ import os
 import time
 
 async def poll(x):
+    """Waits until x has a value that is not False
+    For use of transferring thread to other player
+    """
     while True:
         await asyncio.sleep(.0001)
         if x() and x() != False:
                 return x
-        
+
 class Player:
-    
+    """ Player class for playing Battleship """
+
     CLEAR = "cls" # Different depending on operating system or interpreter
-    
+
     def __init__(self, t, n):
+        """Creates boards and initializes player"""
         self.turn = t
         self.name = n
         self.board = board.ShipBoard()
@@ -29,6 +34,7 @@ class Player:
         self.op = None
 
     async def setup(self, other):
+        """Sets up the board and starts the game"""
         print(f"Board {self.name}:")
         self.board.input_board(lambda : os.system(self.CLEAR))
         self.board.update_commitments()
@@ -48,26 +54,32 @@ class Player:
                 print("Game over")
                 time.sleep(3)
                 raise SystemExit
-        
+
     async def test_proofs(self, x):
+        """Test that all proofs given are correct"""
         assert len(x[0]) == 64
         assert pedersen.Pedersen.verify(8, x[1], x[3])
         assert (functools.reduce(lambda z, y: z * y % x[3].p, x[0])
                 == x[1].c)
         for c, b in zip(x[0], x[2]):
             assert bitproof.verify(c, x[3], b)
-        
+
     async def get_proofs(self):
+        """Waits for commitments to be filled and sends proof to other player"""
         await poll(lambda: self.commitments)
         return self.board.send_initial()
 
     async def get(self, a):
+        """Returns the spot on the board with a commitment
+        to the other player
+        """
         x = self.board.get_spot(a)
         y = self.board.get_commitment(a)
         return pickle.dumps((x, y))
-        
+
 
     async def ask(self):
+        """Checks spot on opponents board with index safety"""
         print(f"Player {self.name}'s turn")
         while True:
             if self.CLEAR:
@@ -96,6 +108,7 @@ class Player:
         time.sleep(2)
 
 async def main():
+    """Initizializes all asynch tasks and sets turn order"""
     a = Player(True, 0)
     b = Player(False, 1)
     c = asyncio.create_task(a.setup(b))
@@ -103,4 +116,5 @@ async def main():
     await c
     await d
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())
