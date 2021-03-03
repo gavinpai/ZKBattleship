@@ -25,8 +25,8 @@ def is_prime(n, s = 128):
     prime = {2, 3, 5, 7, 11, 13, 17, 19, 23,
              29, 31, 37, 41, 43, 47, 53, 59,
              61, 67, 71, 73, 79, 83, 89, 97}
-    if (n < 100:
-        return (n in prime)
+    if n < 100:
+        return n in prime
     else:
         for x in prime:
             if n % x == 0:
@@ -37,12 +37,12 @@ def is_prime(n, s = 128):
         return False
     m = n - 1
     k = 0
-    while (m % 2 == 0):
+    while m % 2 == 0:
         k += 1
         m //= 2
     m = int(m)
     for l in range(s):
-        if (not is_prime_helper(m, k, n)):
+        if not is_prime_helper(m, k, n):
             return False
     return True
 
@@ -50,7 +50,7 @@ def is_prime(n, s = 128):
 def prime_randbits(bit_length):
     """Returns prime number of bits: bit_length"""
     x = secrets.randbits(bit_length - 1) * 2 + 1
-    while (not is_prime(x)):
+    while not is_prime(x):
         x += 2
     return x
 
@@ -60,7 +60,7 @@ def safe_prime_randbits(bit_length):
     Safe primes are primes of which x * 2 + 1 is also a prime
     """
     x = secrets.randbits(bit_length - 1) * 2 + 1
-    while ((not is_prime(x)) or (not is_prime(x * 2 + 1))):
+    while not is_prime(x) or not is_prime(x * 2 + 1):
         x += 2
     return x
 
@@ -70,7 +70,7 @@ def schnorr_prime_randbits(bit_length):
     Schnorr primes are primes of which x * 4 + 1 is also a prime
     """
     x = secrets.randbits(bit_length - 1) * 2 + 1
-    while ((not is_prime(x)) or (not is_prime(x * 4 + 1))):
+    while not is_prime(x) or not is_prime(x * 4 + 1):
         x += 2
     return x
 
@@ -78,8 +78,8 @@ def schnorr_prime_randbits(bit_length):
 def prime_randbelow(n):
     """Returns prime number less than: n"""
     x = secrets.randbelow(n)
-    while (not is_prime(x)):
+    while not is_prime(x):
         x += 2
-    if (x > n):
+    if x > n:
         return prime_randbelow(n)
     return x

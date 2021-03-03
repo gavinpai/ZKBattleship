@@ -52,6 +52,9 @@ class CommitmentBoard(Board):
                             self.send_sum_proof(),
                             self.send_bit_proof(),
                             self.commitment_generator.state))
+    
+    def get_commitment(self, spot):
+        return self.commitment_board[self.get_spot_index(spot)]
 
 class ShipBoard(CommitmentBoard):
         
@@ -120,5 +123,6 @@ class TestProofs(unittest.TestCase):
         self.assertFalse(pedersen.Pedersen.verify(9, c[1], c[3]))
         for x, y in zip(c[0], c[2]):
             self.assertTrue(bitproof.verify(x, c[3], y))
-##if __name__ == "__main__":
-##    unittest.main()
+            
+if __name__ == "__main__":
+    unittest.main()

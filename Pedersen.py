@@ -59,8 +59,7 @@ class Pedersen:
     def verify(x, o_state, p_state):
         """Verifies that x equals the commitments value"""
         return Pedersen.commit_r(p_state, x, o_state.r).c == o_state.c
-
-
+        
 class TestPedersen(unittest.TestCase):
 
     def test_verify(self):
