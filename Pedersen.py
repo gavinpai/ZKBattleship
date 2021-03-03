@@ -2,6 +2,7 @@ import random_prime
 import secrets
 import dataclasses
 import unittest
+import functools
 
 class Pedersen:
     """Generates, holds, and verifies Pedersen Commitments"""
@@ -50,10 +51,9 @@ class Pedersen:
 
     def add_commitments(state, *commitments):
         """Adds an arbitrary amount of Pedersen Commitments"""
-        c, r = 1, 0
-        for commitment in commitments:
-            c = (c * commitment.c) % state.p
-            r = r + commitment.r
+        c = functools.reduce(lambda x, y: x * y % state.p,
+                             map(lambda x : x.c, commitments))
+        r = functools.reduce(lambda x, y: x + y, map(lambda x: x.r, commitments))
         return Pedersen.CommitmentOutput(c, r)
 
     def verify(x, o_state, p_state):

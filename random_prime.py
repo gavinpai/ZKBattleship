@@ -25,7 +25,7 @@ def is_prime(n, s = 128):
     prime = {2, 3, 5, 7, 11, 13, 17, 19, 23,
              29, 31, 37, 41, 43, 47, 53, 59,
              61, 67, 71, 73, 79, 83, 89, 97}
-    if (n < 10000):
+    if (n < 100:
         return (n in prime)
     else:
         for x in prime:
