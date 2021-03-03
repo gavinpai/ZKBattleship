@@ -99,11 +99,11 @@ def bitproof_test():
     b0 = []
     b1 = []
     for i in range(x):
-        b0.append(bitproof.bitproof(0, c0, gen.state).x1 / 1.0)
-        b1.append(bitproof.bitproof(1, c1, gen.state).x1 / 1.0)
+        b0.append(bitproof.bitproof(0, c0, gen.state).y1 / 1.0)
+        b1.append(bitproof.bitproof(1, c1, gen.state).y1 / 1.0)
         if (i % (x/100) == 0):
             print(100 * i / x)
-    print("x1")
+    print("y1")
     print(stats.ks_2samp(b0, b1))
     print("ks 0:", stats.kstest(b0, "uniform"))
     print("ks 1:", stats.kstest(b1, "uniform"))
@@ -113,5 +113,8 @@ def bitproof_test():
     print("1 repeats:", stats.find_repeats(b1))
     print("0 entropy:", stats.entropy(b0))
     print("1 entropy:", stats.entropy(b1))
-    input()
+    plt.hist(b0, bins = "auto", range = (0, gen.state.p / 1.0))
+    plt.show()
+    plt.hist(b1, bins = "auto", range = (0, gen.state.p / 1.0))
+    plt.show()
 bitproof_test()
