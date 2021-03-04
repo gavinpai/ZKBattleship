@@ -1,5 +1,5 @@
 # CSRSEF
-This project was built to demonstrate a protcol to play Battleship without a trusted party. In this project, multiple modules have been created to fulfill this task, and all code is my own. I will go over each module in the following sections. 
+This project was built to demonstrate a protcol to play Battleship without a trusted party. In this project, multiple modules have been created to fulfill this task, and **all** code is my own. I will go over each module in the following sections. 
 
 ## Adaptable modules (useful for other cases)
 
@@ -14,5 +14,11 @@ This module implements a modified Schnorr protocol (https://link.springer.com/ar
 
 ## Case specific modules (useful for Battleship only)
 
-## board.py
-In the board module, each board that would be used in the actual Battleship was designined. First a board class that all others would be inherited from was programmed with the methods to return a spot on the board given a Battleship coordinate...
+### board.py
+In the board module, each board that would be used in the actual Battleship was designined. First a board class that all others would be inherited from was programmed with the methods to return a spot on the board given a Battleship coordinate. Then boards for specific purposes like holding public commitments or responses from the other player were made. Finally a ship board was made that inherited from the commitment board such that it could hold the commitments and spaces parallel to each other. The commitment board contains the functionality to create commitments and proofs for those commitments while the other two boards contain the functionality to return the board as a string and toggle a space.
+
+### __main__.py
+Finally the main program was written. I designed a player class such that, theoretically, the two players can play online and there is a degree of encapsulation. It was asynchornous so that one player could wait until another player to input their board or do their turn without making IO operations broken. First both players input their board, and the game starts. Each player has the other player instance has a variable so that they can call a function to get the value of, say, a specific square. Players take turns asking squares until all ships are found.
+
+### stats.py
+This module can be safely ignored. It is only for my personal use of analyzing the distributions of bitproofs or commitments and making graphs for my posterboard. This is the **only** module that uses libraries outside of the standard library. MatPlotLib and SciPy are not needed if this modulle is not used.
