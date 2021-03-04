@@ -2,9 +2,8 @@ import secrets
 import hashlib
 import pickle
 import dataclasses
-import unittest
 import pedersen
-
+import unittest
 
 def bitproof(message, commitment, state):
     """Generates bit proof"""
@@ -32,6 +31,7 @@ def bitproof(message, commitment, state):
         raise ValueError
     return Output(e, e0, e1, x0, x1, y0, y1)
 
+
 @dataclasses.dataclass
 class Output:
     """Holds public output of bit proof"""
@@ -42,6 +42,7 @@ class Output:
     x1: int
     y0: int
     y1: int
+
 
 def hash_int(x):
     """Pickles, hashes, and returns input as an integer"""
@@ -83,3 +84,4 @@ class TestBitProof(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
