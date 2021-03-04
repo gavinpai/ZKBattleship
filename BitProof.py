@@ -8,10 +8,10 @@ import pedersen
 
 def bitproof(message, commitment, state):
     """Generates bit proof"""
+    r = secrets.randbelow(state.p)
     if message == 0:
         e1 = secrets.randbelow(state.p)
         y1 = secrets.randbelow(state.p)
-        r = secrets.randbelow(state.p)
         x0 = pow(state.h, r, state.p)
         x1 = (pow(state.h, y1, state.p)
               * pow(commitment.c * pow(state.g, -1, state.p), -e1, state.p)
@@ -22,7 +22,6 @@ def bitproof(message, commitment, state):
     elif message == 1:
         e0 = secrets.randbelow(state.p)
         y0 = secrets.randbelow(state.p)
-        r = secrets.randbelow(state.p)
         x1 = pow(state.h, r, state.p)
         x0 = (pow(state.h, y0, state.p)
               * pow(commitment.c, -e0, state.p) % state.p)
