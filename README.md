@@ -1,4 +1,4 @@
-# CSRSEF
+# ZeroKnowledgeBattleship
 This project was built to demonstrate a protcol to play Battleship without a trusted party. In this project, multiple modules have been created to fulfill this task, and **all** code is my own. I will go over each module in the following sections. 
 
 ## Adaptable modules (useful for other cases)
