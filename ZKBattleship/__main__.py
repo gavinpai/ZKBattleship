@@ -7,6 +7,8 @@ import asyncio
 import os
 import time
 
+CLEAR = "cls" # Different depending on operating system or interpreter
+    
 async def poll(x):
     """Waits until x has a value that is not False
     For use of transferring thread to other player
@@ -18,8 +20,6 @@ async def poll(x):
 
 class Player:
     """ Player class for playing Battleship """
-
-    CLEAR = "cls" # Different depending on operating system or interpreter
 
     def __init__(self, t, n):
         """Creates boards and initializes player"""
@@ -36,7 +36,10 @@ class Player:
     async def setup(self, other):
         """Sets up the board and starts the game"""
         print(f"Board {self.name}:")
-        self.board.input_board(lambda : os.system(self.CLEAR))
+        if CLEAR:
+            self.board.input_board(lambda : os.system(CLEAR))
+        else:
+            self.baord.input_board()
         self.board.update_commitments()
         self.other = other
         self.other.commitments = self.board.commitment_board
@@ -82,8 +85,8 @@ class Player:
         """Checks spot on opponents board with index safety"""
         print(f"Player {self.name}'s turn")
         while True:
-            if self.CLEAR:
-                os.system(self.CLEAR)
+            if CLEAR:
+                os.system(CLEAR)
             print(self.guess)
             a = input("Input a coordinate to guess: \n")
             try:
@@ -91,8 +94,8 @@ class Player:
                     x = pickle.loads(await self.other.get(a))
                     assert pedersen.Pedersen.verify(x[0], x[1], self.op)
                     self.guess.set_spot(a, 2 if x[0] == 1 else 1)
-                    if self.CLEAR:
-                        os.system(self.CLEAR)
+                    if CLEAR:
+                        os.system(CLEAR)
                     print(self.guess)
                     if x[0] == 1:
                         self.score += 1
@@ -109,6 +112,8 @@ class Player:
 
 async def main():
     """Initizializes all asynch tasks and sets turn order"""
+    if CLEAR:
+        os.system(CLEAR)
     a = Player(True, 0)
     b = Player(False, 1)
     c = asyncio.create_task(a.setup(b))
