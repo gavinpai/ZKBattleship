@@ -16,7 +16,7 @@ The way to account for this lies with the challenge scalar. If the challenge sca
 
 One final nuance to this project is that the challenge scalar is not actually chosen by the verifier. It is instead computed using a Fiat-Shamir heuristic. This is a way to make an interactive zero-knowledge proof where a verifier supplies a challenge scalar to a non-interactive zero-knowledge proof. This is done through using a cryptographic hash function on what would be the first message of the interactive proof to determine the challenge scalar.
 
-The specific modules that make up this package and a few specific implementation details are provided below, albeit mostly in less depth. All code is my own, and only the standard library was used for the protocol itself. The statistics module is the only of which requires additional libraries.
+The specific modules that make up this package and a few specific implementation details are provided below, albeit mostly in less depth. All code is my own, and only the standard library was used for the protocol itself. The statistics module is the only module that requires additional libraries.
 
 More details about Pedersen Commitments, the Schnorr Protocol and the Fiat-Shamir Heuristic can be found in the following links:
 
