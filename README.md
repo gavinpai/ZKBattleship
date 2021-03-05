@@ -1,6 +1,6 @@
 # ZKBattleship
 
-This problem this project aimed to solve was making a game of Battleship where each player can ensure that the other is not cheating in real time. This may sound easy; however, an additional limitation present is that there can be no trusted agent to check each board. Therefore, no one but the person who created the arrangement of ships can know where each ship is until they choose to reveal that information.
+The problem this project aimed to solve was making a game of Battleship where each player can ensure that the other is not cheating in real time. This may sound easy; however, an additional limitation present is that there can be no trusted agent to check each board. Therefore, no one but the person who created the arrangement of ships can know where each ship is until they choose to reveal that information.
 
 Your first instinct for solving this problem may be something like using a cryptographic hash function on each board space and sending that prior to playing the game. The problem with this is that the input space is small, the output space will also be small for a cryptographic hash function. Given that the inputs will always be a one or a zero, it would be very easy to tell what each space is. Another issue with this is one could put in bogus input of ships and the other player would not know in real time that the opposing player was cheating, wasting their time.
 
