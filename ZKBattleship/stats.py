@@ -99,7 +99,7 @@ def pedersen_distribution():
     print("1 entropy:", stats.entropy(c1))
     input()
 
-def bitproof_test(z, same_graph = False, x = 100000):
+def bitproof_test(z, title, same_graph = True, x = 100000):
     """Print's histogram for selected value of bitproof commitment
     along with statistical tests on the values
     z takes the form of lambda x: x.(variable here)
@@ -126,11 +126,16 @@ def bitproof_test(z, same_graph = False, x = 100000):
     print("1 repeats:", stats.find_repeats(b1))
     print("0 entropy:", stats.entropy(b0))
     print("1 entropy:", stats.entropy(b1))
-    plt.hist(b0, bins = "auto", range = (0, gen.state.p / 1.0))
+    plt.title(f"Histogram of {title} Values")
+    plt.hist(b0, bins = "auto", range = (0, gen.state.p / 1.0)) 
     if not same_graph:
+        plt.ylabel("Occurences")
+        plt.xlabel("Variable value")
         plt.show()
     plt.hist(b1, bins = "auto", range = (0, gen.state.p / 1.0))
+    plt.ylabel("Occurences")
+    plt.xlabel("Variable value")
     plt.show()
 
 if __name__ == "__main__":
-    bitproof_test(lambda x : x.y1, True)
+    bitproof_test(lambda x : x.x0, "Distribution of x0")
