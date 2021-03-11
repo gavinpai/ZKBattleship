@@ -116,7 +116,7 @@ def bitproof_test(z, title, same_graph = True, x = 100000):
         b1.append(z(bitproof.bitproof(1, c1, gen.state)) / 1.0)
         if (i % (x/100) == 0):
             print(100 * i / x)
-    print("y1")
+    print(title)
     print(stats.ks_2samp(b0, b1))
     print("ks 0:", stats.kstest(b0, "uniform"))
     print("ks 1:", stats.kstest(b1, "uniform"))
@@ -137,5 +137,47 @@ def bitproof_test(z, title, same_graph = True, x = 100000):
     plt.xlabel("Variable value")
     plt.show()
 
+def t():
+    x = 6400
+    t = [[], [], [], [], []]
+    c = []
+    gen = pedersen.Pedersen(256)
+    for j in range(x):
+        if j % 64 == 0 and j != 0:
+            start = time.time()
+            l = pedersen.Pedersen.add_commitments(gen.state, *c)
+            end = time.time()
+            t[4].append(end-start)
+            start = time.time()
+            gen = pedersen.Pedersen(256)
+            end = time.time()
+            t[1].append(end - start)
+        start = time.time()
+        ab = gen.commit(j % 2)
+        end = time.time()
+        c.append(ab)
+        t[0].append(end-start)
+        start = time.time()
+        v = pedersen.Pedersen.verify(j % 2, ab, gen.state)
+        end = time.time()
+        t[2].append(end-start)
+        start = time.time()
+        b = bitproof.bitproof(j % 2, ab, gen.state)
+        end = time.time()
+        t[3].append(end-start)
+        print(j)
+        
+    print(t)  
+    tt = []
+    for a in t:
+        tt.append(statistics.fmean(a))
+    plt.xscale("log")
+    plt.xlabel("Average Time (s)")
+    plt.title("Action Speed")
+    plt.barh(["Commit Value", "Create Pedersen Generator", "Verify Commitment", "Create Bit Proof", "Add 64 Commitments"], tt)
+    plt.show()
+
+
 if __name__ == "__main__":
-    bitproof_test(lambda x : x.x0, "Distribution of x0")
+    #bitproof_test(lambda x : x.e1, "Distribution of e1")
+    t()
