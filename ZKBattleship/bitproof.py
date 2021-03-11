@@ -13,7 +13,7 @@ def bitproof(message, commitment, state):
         y1 = secrets.randbelow(state.p)
         x0 = pow(state.h, r, state.p)
         x1 = (pow(state.h, y1, state.p)
-              * pow(commitment.c * pow(state.g, -1, state.p), -e1, state.p)
+              * pow(state.g * pow(commitment.c, -1, state.p), e1, state.p)
               % state.p)
         e = hash_int((x0, x1)) % state.p
         e0 = (e - e1) % state.p
